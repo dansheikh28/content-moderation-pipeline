@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local data/artifacts
+data/
+models/
+reports/
+outputs/
+mlruns/     # MLflow local file store
+
+# IDE/OS
+.DS_Store
+.idea/
+.vscode/
