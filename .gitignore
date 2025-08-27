@@ -1,26 +1,26 @@
-# Python
-__pycache__/
-*.pyc
-.venv/
-*.egg-info/
-dist/
-build/
+# Airflow & logs
+.airflow/
+logs/
 
-# Caches
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
+# Env files / secrets
+.env
+**/.env
+*.env
+.env.*
+docker/.env
+infra/.env
 
-# Local data/artifacts
-data/
-models/
-reports/
-outputs/
-mlruns/     # MLflow local file store
+# Notebooks
+.ipynb_checkpoints/
 
-# IDE/OS
-.DS_Store
-.idea/
-.vscode/
+# Windows
+Thumbs.db
+
+# (Optional) keep folder structure but not data
+# Track an empty placeholder so /data exists in fresh clones & for Docker binds
+/data/**
+!/data/.gitkeep
+# If you want to ship one tiny sample CSV for demos:
+!/data/raw/
+ /data/raw/**
+!/data/raw/raw_comments.sample.csv
