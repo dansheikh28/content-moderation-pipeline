@@ -10,4 +10,12 @@
 
 ```mermaid
 flowchart LR
-  A[Start] --> B[OK]
+  A[Raw Comments (batch/stream)]
+  B[Airflow: Extract & Clean]
+  C[Airflow: Score Toxicity (HF Transformer)]
+  D[(S3/MinIO: scored Parquet)]
+  E[Daily Summary / Analytics]
+  G[[FastAPI /moderate]]
+
+  A --> B --> C --> D --> E
+  G --> C
