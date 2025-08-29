@@ -1,6 +1,7 @@
 # Airflow & logs
 .airflow/
 logs/
+*.log
 
 # Env files / secrets
 .env
@@ -15,6 +16,16 @@ infra/.env
 
 # Windows
 Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Data & model caches
+data/
+huggingface/
+.cache/
 
 # (Optional) keep folder structure but not data
 # Track an empty placeholder so /data exists in fresh clones & for Docker binds
