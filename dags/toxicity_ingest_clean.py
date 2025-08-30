@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator  # type: ignore
 
 # Use your existing code in src/moderation/*
-from moderation.pipeline import clean, ingest, score_toxicity, store
+from moderation.pipeline import clean, ingest, score_multilabel, store
 
 # Resolve repo root: .../content-moderation-pipeline
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +22,7 @@ with DAG(
     description="Ingest -> Clean -> (Store Clean + Score -> Store Scored)",
     default_args=default_args,
     start_date=datetime(2024, 1, 1),
-    schedule_interval=None,  # run manually for now
+    schedule=None,  # run manually for now
     catchup=False,
     tags=["moderation", "etl"],
 ) as dag:
@@ -52,17 +52,32 @@ with DAG(
 
         records = context["ti"].xcom_pull(key="clean_records", task_ids="clean_text")
         df = pd.DataFrame.from_records(records)
-        # Compute toxicity on clean_text
-        df["toxicity_score"] = score_toxicity(df["clean_text"].tolist())
+
+        # Multi-label scoring on clean_text
+        ml = score_multilabel(df["clean_text"].to_list())  # DataFrame with label columns + flagged
+
+        # Attach all new columns
+        for col in ml.columns:
+            df[col] = ml[col].values
+
+        # Optional - keep legacy single column for continuity
+        if "toxicity_score" not in df.columns and "toxic" in df.columns:
+            df["toxicity_score"] = df["toxic"]
+
         context["ti"].xcom_push(key="scored_records", value=df.to_dict(orient="records"))
 
-    def _store_scored(**context):
+    def _store_scored(ds=None, **context):
         import pandas as pd
 
         records = context["ti"].xcom_pull(key="scored_records", task_ids="score")
         df = pd.DataFrame.from_records(records)
-        OUT_PARQUET_SCORED.parent.mkdir(parents=True, exist_ok=True)
-        path = store(df, OUT_PARQUET_SCORED)
+
+        # Partitioned path: data/scored/st=<ds>/cleaned_scored.parquet
+        ds_str = ds or context.get("ds")
+        out_path = REPO_ROOT / "data" / "scored" / f"dt={ds_str}" / "cleaned_scored.parquet"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        path = store(df, out_path)
         return str(path)
 
     extract = PythonOperator(task_id="extract", python_callable=_extract)

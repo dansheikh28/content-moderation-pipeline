@@ -11,6 +11,10 @@ from .io import read_raw_csv, write_parquet
 # Lazy load - so the model doesn not reload every call
 _toxicity_model = None
 
+# Multi label thresholding
+MULTI_LABELS = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+THRESHOLD = 0.5  # flag a row if any label >= 0.5
+
 
 def ingest(raw_csv_path: str | Path) -> pd.DataFrame:
     return read_raw_csv(raw_csv_path)
@@ -64,6 +68,31 @@ def score_toxicity(texts):
     return scores
 
 
+def score_multilabel(texts) -> pd.DataFrame:
+    """
+    Given a list of texts, return a DataFrame with columns for each label in MULTI_LABELS,
+    plus a boolean 'flagged' column indicating any label >= THRESHOLD.
+    """
+    if not isinstance(texts, list):
+        texts = list(texts)
+
+    model = get_toxicity_model()
+    results = model(texts, truncation=True)  # list[list[{'label', 'score'},...]]
+
+    rows = []
+    for r in results:
+        row_scores = {label: 0.0 for label in MULTI_LABELS}
+        for item in r:
+            lab = item["label"].lower()
+            if lab in row_scores:
+                row_scores[lab] = float(item["score"])
+        rows.append(row_scores)
+
+    out = pd.DataFrame(rows)
+    out["flagged"] = (out[MULTI_LABELS] >= THRESHOLD).any(axis=1)
+    return out
+
+
 def run_local(raw_csv_path: str | Path, out_parquet: str | Path) -> Path:
     # 1. Ingest raw
     df = ingest(raw_csv_path)
@@ -71,8 +100,13 @@ def run_local(raw_csv_path: str | Path, out_parquet: str | Path) -> Path:
     # 2. Clean
     df = clean(df)
 
-    # 3. Score toxicity
-    df["toxicity_score"] = score_toxicity(df["clean_text"].tolist())
+    # 3. Score (multi-label)
+    ml = score_multilabel(df["clean_text"].tolist())
+    df["toxicity_score"] = ml["toxic"]
+
+    # Merge the rest of the labels + flagged
+    for col in MULTI_LABELS + ["flagged"]:
+        df[col] = ml[col]
 
     # 4. Store
     return store(df, out_parquet)
