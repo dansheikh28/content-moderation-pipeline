@@ -22,16 +22,24 @@ __pycache__/
 *.pyc
 .venv/
 
-# Data & model caches
-data/
+# Hugging Face / cache
 huggingface/
 .cache/
 
-# (Optional) keep folder structure but not data
-# Track an empty placeholder so /data exists in fresh clones & for Docker binds
-/data/**
-!/data/.gitkeep
-# If you want to ship one tiny sample CSV for demos:
-!/data/raw/
- /data/raw/**
-!/data/raw/raw_comments.sample.csv
+# Data folders (ignore runtime artifacts, keep placeholders and samples)
+data/incoming/**
+!data/incoming/.gitkeep
+
+data/processed/**
+!data/processed/.gitkeep
+
+data/scored/**
+!data/scored/.gitkeep
+
+data/quarantine/**
+!data/quarantine/.gitkeep
+
+# Raw data: allow sample file only
+data/raw/**
+!data/raw/
+!data/raw/raw_comments.sample.csv
