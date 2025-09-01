@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: moderation-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../src:/app/src:ro
+      - ../data:/app/data
+      - ../reports:/app/reports
+    environment:
+      - PYTHONPATH=/app/src

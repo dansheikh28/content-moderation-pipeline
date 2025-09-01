@@ -8,3 +8,5 @@ reports/
 outputs/
 mlruns/
 .git
+.venv/
+logs/

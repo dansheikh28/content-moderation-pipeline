@@ -110,3 +110,15 @@ def run_local(raw_csv_path: str | Path, out_parquet: str | Path) -> Path:
 
     # 4. Store
     return store(df, out_parquet)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run local moderation pipeline")
+    parser.add_argument("raw_csv", help="Path to raw CSV with comments")
+    parser.add_argument("out_parquet", help="Path to output scored Parquet file")
+    args = parser.parse_args()
+
+    out_path = run_local(args.raw_csv, args.out_parquet)
+    print(f"Wrote scored file to {out_path}")
