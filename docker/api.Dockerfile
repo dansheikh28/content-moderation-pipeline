@@ -25,9 +25,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=model /root/.cache/huggingface /root/.cache/huggingface
 
-# Copy only source code
-COPY src ./src
-
 # Copy source code (API + libs)
 COPY src ./src
 
