@@ -29,7 +29,6 @@ COPY --from=model /root/.cache/huggingface /root/.cache/huggingface
 COPY src ./src
 
 # Copy source code (API + libs)
-COPY service ./service
 COPY src ./src
 
 # Ensure both /app and /app/src are on PYTHONPATH for src-layout + service imports
