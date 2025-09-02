@@ -43,5 +43,6 @@ data/quarantine/**
 data/raw/**
 !data/raw/
 !data/raw/raw_comments.sample.csv
+!data/raw/raw_comments.csv
 
 .data/
