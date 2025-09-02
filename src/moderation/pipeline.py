@@ -10,6 +10,7 @@ from .io import read_raw_csv, write_parquet
 
 # Lazy load - so the model doesn not reload every call
 _toxicity_model = None
+MODEL_VERSION = "unitary/toxic-bert@v1"
 
 # Multi label thresholding
 MULTI_LABELS = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
