@@ -1,4 +1,6 @@
 # Content Moderation Pipeline
+[![CI](https://github.com/dansheikh28/content-moderation-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/dansheikh28/content-moderation-pipeline/actions/workflows/ci.yml)
+
 
 #### End-to-end pipeline for detecting toxic content.
 
