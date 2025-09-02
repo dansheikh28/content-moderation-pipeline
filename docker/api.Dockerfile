@@ -28,5 +28,12 @@ COPY --from=model /root/.cache/huggingface /root/.cache/huggingface
 # Copy only source code
 COPY src ./src
 
+# Copy source code (API + libs)
+COPY service ./service
+COPY src ./src
+
+# Ensure both /app and /app/src are on PYTHONPATH for src-layout + service imports
+ENV PYTHONPATH=/app:/app/src
+
 EXPOSE 8000
 CMD ["uvicorn", "service.app:app", "--host", "0.0.0.0", "--port", "8000"]
